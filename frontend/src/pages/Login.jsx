@@ -104,8 +104,8 @@ const Login = () => {
     <div className='min-h-screen bg-gray-100 flex flex-col justify-center items-center p-4'>
 
 
-      <div className='text-4xl font-extrabold text-indigo-700 mb-8 flex items-center gap-2'>
-        <span className='text-indigo-600'><LogoIcon /></span> CUPPU
+      <div className='text-4xl font-extrabold text-gray-700 mb-8 flex items-center gap-2'>
+        <span className='text-gray-600'><LogoIcon /></span> CUPPU
       </div>
 
 
