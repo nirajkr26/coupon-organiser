@@ -108,7 +108,7 @@ flowchart LR
     end
 
     subgraph BE[Backend - Express API]
-        api[/api routes]
+        api[/api routes/]
         authR[Auth Routes\n/signup /login /logout /verify]
         couponR[Coupon Routes\nGET/POST/PUT/DELETE /coupon]
         profileR[Profile Routes\n/profile/update\n/profile/password\n/profile/delete]
