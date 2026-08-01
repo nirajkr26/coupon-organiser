@@ -66,6 +66,89 @@ coupon-organizer/
 5. `userAuth` middleware protects coupon/profile routes.
 6. Cron job runs daily and emails grouped expiry alerts.
 
+## Database Architecture (Mermaid)
+
+```mermaid
+erDiagram
+    USER ||--o{ COUPON : owns
+
+    USER {
+        ObjectId _id
+        string firstName
+        string lastName
+        string email
+        string password_hash
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    COUPON {
+        ObjectId _id
+        ObjectId userId
+        string title
+        string code
+        string category
+        number discount
+        date expiryDate
+        datetime createdAt
+        datetime updatedAt
+    }
+```
+
+## System Architecture (Mermaid)
+
+```mermaid
+flowchart LR
+    user[User Browser]
+
+    subgraph FE[Frontend - React + Vite]
+        app[App Router\nLanding/Login/Dashboard/Coupons/Profile]
+        ctx[AuthContext\nuser + coupon state]
+        ui[Sidebar/CreateCoupon/CouponCard/Profile UI]
+    end
+
+    subgraph BE[Backend - Express API]
+        api[/api routes]
+        authR[Auth Routes\n/signup /login /logout /verify]
+        couponR[Coupon Routes\nGET/POST/PUT/DELETE /coupon]
+        profileR[Profile Routes\n/profile/update\n/profile/password\n/profile/delete]
+        middleware[userAuth Middleware\nJWT from cookie]
+        cleanup[Login Cleanup\ncleanUpExpiredCoupons]
+        cron[Daily Cron Job\nexpiryCron]
+        email[Email Service\nNodemailer sendExpiryEmail]
+    end
+
+    subgraph DATA[Data + External Services]
+        mongo[(MongoDB\nUser + Coupon collections)]
+        jwt[JWT Secret]
+        smtp[(Gmail SMTP)]
+    end
+
+    user --> app
+    app <--> ctx
+    app --> ui
+    ui -->|Axios + withCredentials| api
+    api --> authR
+    api --> couponR
+    api --> profileR
+
+    authR -->|issue/verify token| jwt
+    authR --> mongo
+    authR --> cleanup
+    cleanup --> mongo
+
+    couponR --> middleware
+    profileR --> middleware
+    middleware -->|verify cookie token| jwt
+    middleware --> mongo
+    couponR --> mongo
+    profileR --> mongo
+
+    cron -->|find coupons expiring tomorrow| mongo
+    cron --> email
+    email --> smtp
+```
+
 ## Backend API Reference
 
 Base path: `/api`
